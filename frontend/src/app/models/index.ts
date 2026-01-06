@@ -1,0 +1,31 @@
+export interface UserData {
+  id?: string;
+  name: string;
+  login: string;
+  lastTestDate?: string,
+  createdAt?: string;
+  wordsCount?: number,
+  password?: number
+}
+
+export interface LoginResponse {
+  success: boolean,
+  token: string
+}
+
+export interface WordData {
+  id?: string,
+  word: string,
+  translate: string,
+  ownerLogin: string,
+  progress?: number,
+  isFavorite: boolean,
+  isLearned: boolean,
+  lastUpdate: string
+}
+
+export interface ConfirmationPopupData {
+  title: string,
+  message: string,
+  onConfirm: () => void,
+}

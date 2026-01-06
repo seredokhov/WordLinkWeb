@@ -1,0 +1,187 @@
+import UserModel from "../models/user.js";
+import WordModel from "../models/word.js";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
+import { wordResponseMapper } from '../utils.js';
+
+export const login = async  (req, res) => {
+    try {
+        const { login, password } = req.body;
+
+        if (login !== process.env['ADMIN_ROOT'] || password !== process.env['ADMIN_PASSWORD']) {
+            console.log('WRONG')
+            return res.status(400).json({
+                message: 'Wrong login or password'
+            });
+        }
+
+        const token = jwt.sign(
+            {
+                login: login
+            },
+            process.env['SECRET_KEY'],
+            {
+                expiresIn: process.env['TOKEN_EXPIRES']
+            }
+        );
+
+        res.json({ token });
+    } catch (err) {
+        res.status(500).json({
+            message: 'Login error'
+        });
+    }
+}
+
+export const createNewUser = async (req, res) => {
+    try {
+        const {
+            login,
+            name,
+            password
+        } = req.body;
+
+        const salt = await bcrypt.genSalt(10);
+        const passwordHash = await bcrypt.hash(password, salt);
+
+        const doc = new UserModel({
+            login,
+            name,
+            passwordHash
+        });
+
+        const user = await doc.save();
+
+        const newUser = {
+            id: user._doc._id,
+            name: user._doc.name,
+            login: user._doc.login,
+            lastTestDate: user._doc.lastTestDate,
+            allowedTests: user._doc.allowedTests,
+            createdAt: user._doc.createdAt,
+            words: 0
+        };
+
+        res.json(newUser);
+    } catch (err) {
+        res.status(500).json({
+            message: 'Registration error'
+        });
+    }
+};
+
+export const getAllUsers = async (req, res) => {
+    try {
+        const users = await UserModel.find({});
+        const words = await WordModel.find({});
+
+        const mappedUsers = users.map(user => {
+            const usersWords = words.filter(word => word.userId.equals(user._id));
+
+            return {
+                id: user._id,
+                login: user.login,
+                name: user.name,
+                lastTestDate: user.lastTestDate,
+                createdAt: user.createdAt,
+                wordsCount: usersWords.length
+            };
+        });
+
+        res.json(mappedUsers);
+    } catch (err) {
+        res.status(500).json({
+            message: 'Cant get users'
+        });
+    }
+}
+
+export const updateUser = async (req, res) => {
+    try {
+        const user = await UserModel.findByIdAndUpdate(
+            {
+                _id: req.body.id
+            },
+            {
+                name: req.body.name,
+                login: req.body.login
+            },
+            {
+                new: true
+            }
+        );
+
+        const mappedUserData = {
+            login: user.login,
+            name: user.name,
+        };
+
+        res.json(mappedUserData);
+    } catch (err) {
+        res.status(500).json({
+            message: 'Cant update user'
+        });
+    }
+};
+
+export const deleteUser = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        await WordModel.deleteMany({
+            userId: id
+        });
+
+        await UserModel.findOneAndDelete({
+            _id: id
+        });
+
+        res.json({
+            success: true
+        });
+    } catch (err) {
+        res.status(500).json({
+            message: 'Cant delete user'
+        });
+    }
+}
+
+export const getAllWords = async (req, res) => {
+    try {
+        const words = await WordModel.find({});
+        const users = await UserModel.find({});
+
+        const mappedWords = words.map(word => {
+            const wordOwner = users.find(user => user._id.equals(word.userId));
+
+            return {
+                ...wordResponseMapper(word),
+                ownerLogin: wordOwner.login
+            }
+        });
+
+        res.json(mappedWords);
+    } catch (err) {
+        res.json({
+            message: 'Cant fetch words'
+        })
+    }
+}
+
+export const deleteWord = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        await WordModel.findOneAndDelete({
+            _id: id
+        });
+
+        res.json({
+            success: true
+        });
+    } catch (err) {
+        res.status(500).json({
+            message: 'Cant delete word'
+        });
+    }
+}

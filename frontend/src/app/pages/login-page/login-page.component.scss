@@ -1,0 +1,33 @@
+.page {
+  align-items: center;
+  background-color: var(--primary);
+  display: flex;
+  justify-content: center;
+  height: 100vh;
+
+  .login-form {
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    padding: 40px;
+    width: 400px;
+
+    &__title {
+      font-weight: 500;
+      font-size: 30px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    &__error {
+      color: var(--white);
+    }
+
+    &__error-block {
+      background-color: red;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      padding: 10px;
+    }
+  }
+}

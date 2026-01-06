@@ -1,0 +1,23 @@
+.confirmation-popup {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  width: 400px;
+
+  &__content,
+  &__actions {
+    padding: 0px;
+  }
+
+  &__content {
+    margin-bottom: 10px;
+  }
+
+  &__actions {
+    display: flex;
+  }
+
+  &__button {
+    flex-grow: 1;
+  }
+}

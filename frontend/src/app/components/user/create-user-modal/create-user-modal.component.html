@@ -1,0 +1,89 @@
+<form [formGroup]="userForm" class="create-user-form">
+  <mat-dialog-content class="create-user-form-content">
+    <h2 class="create-user-form-content__title">
+      <span >Create User</span>
+    </h2>
+    <mat-form-field>
+      <mat-label>Login</mat-label>
+      <input
+        matInput
+        maxlength="10"
+        formControlName="login"
+      >
+      <mat-error *ngIf="userForm.controls['login'].invalid && (userForm.controls['login'].touched || userForm.controls['login'].dirty)">
+        Enter Login
+      </mat-error>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Name</mat-label>
+      <input
+        matInput
+        maxlength="10"
+        formControlName="name"
+      >
+      <mat-error *ngIf="userForm.controls['name'].invalid && (userForm.controls['name'].touched || userForm.controls['name'].dirty)">
+        Enter Name
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Password</mat-label>
+      <input
+        matInput
+        formControlName="password"
+        [type]="isPasswordHide ? 'password' : 'text'"
+      >
+      <button
+        mat-icon-button
+        matSuffix
+        (click)="isPasswordHide = !isPasswordHide"
+        [attr.aria-label]="'Hide password'"
+        [attr.aria-pressed]="isPasswordHide"
+      >
+        <mat-icon>{{isPasswordHide ? 'visibility_off' : 'visibility'}}</mat-icon>
+      </button>
+      <mat-error *ngIf="userForm.controls['password'].invalid && (userForm.controls['password'].touched || userForm.controls['password'].dirty)">
+        Enter Password
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Password</mat-label>
+      <input
+        matInput
+        formControlName="passwordConfirm"
+        [type]="isNewPasswordHide ? 'password' : 'text'"
+      >
+      <button
+        mat-icon-button
+        matSuffix
+        (click)="isNewPasswordHide = !isNewPasswordHide"
+        [attr.aria-label]="'Hide password'"
+        [attr.aria-pressed]="isNewPasswordHide"
+      >
+        <mat-icon>{{isNewPasswordHide ? 'visibility_off' : 'visibility'}}</mat-icon>
+      </button>
+      <mat-error *ngIf="userForm.controls['passwordConfirm'].invalid && (userForm.controls['passwordConfirm'].touched || userForm.controls['passwordConfirm'].dirty)">
+        Password mismatch
+      </mat-error>
+    </mat-form-field>
+  </mat-dialog-content>
+  <mat-dialog-actions class="create-user-form-actions">
+    <button
+      [disabled]="!userForm.valid || userForm.controls['password'].value !== userForm.controls['passwordConfirm'].value"
+      mat-raised-button
+      color="primary"
+      class="create-user-form-actions__button"
+      (click)="saveData()"
+    >
+      Save
+    </button>
+    <button
+      mat-raised-button
+      mat-dialog-close
+      class="create-user-form-actions__button"
+    >
+      Close
+    </button>
+  </mat-dialog-actions>
+</form>

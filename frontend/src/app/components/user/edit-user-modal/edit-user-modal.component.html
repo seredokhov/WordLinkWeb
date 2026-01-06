@@ -1,0 +1,47 @@
+<form [formGroup]="userForm" class="edit-user-form">
+  <mat-dialog-content class="edit-user-form-content">
+    <h2 class="edit-user-form-content__title">
+      <span >Edit User</span>
+    </h2>
+    <mat-form-field>
+      <mat-label>Login</mat-label>
+      <input
+        matInput
+        maxlength="10"
+        formControlName="login"
+      >
+      <mat-error *ngIf="userForm.controls['login'].invalid && (userForm.controls['login'].touched || userForm.controls['login'].dirty)">
+        Enter Login
+      </mat-error>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Name</mat-label>
+      <input
+        matInput
+        maxlength="10"
+        formControlName="name"
+      >
+      <mat-error *ngIf="userForm.controls['name'].invalid && (userForm.controls['name'].touched || userForm.controls['name'].dirty)">
+        Enter Name
+      </mat-error>
+    </mat-form-field>
+  </mat-dialog-content>
+  <mat-dialog-actions class="edit-user-form-actions">
+    <button
+      [disabled]="!userForm.valid"
+      mat-raised-button
+      color="primary"
+      class="edit-user-form-actions__button"
+      (click)="saveData()"
+    >
+      Save
+    </button>
+    <button
+      mat-raised-button
+      mat-dialog-close
+      class="edit-user-form-actions__button"
+    >
+      Close
+    </button>
+  </mat-dialog-actions>
+</form>

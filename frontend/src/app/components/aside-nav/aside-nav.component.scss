@@ -1,0 +1,20 @@
+.router-link {
+  &__body {
+    display: flex;
+    align-items: center;
+  }
+
+  &-active {
+    background-color: var(--primary-darker);
+  }
+
+  &__name {
+    color: var(--white);
+  }
+
+  &__icon {
+    color: var(--white);
+    margin-right: 10px;
+  }
+}
+

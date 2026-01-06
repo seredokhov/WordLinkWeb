@@ -1,0 +1,27 @@
+<div class="main">
+  <mat-toolbar color="primary">
+    <button
+      mat-icon-button
+      (click)="sidenav.toggle()"
+    >
+      <mat-icon *ngIf="!this.sidenav.opened">menu</mat-icon>
+      <mat-icon *ngIf="this.sidenav.opened">arrow_back</mat-icon>
+    </button>
+    <span>{{this.title}}</span>
+    <span class="example-spacer"></span>
+    <button
+      mat-icon-button
+      (click)="logout()"
+    >
+      <mat-icon>logout</mat-icon>
+    </button>
+  </mat-toolbar>
+  <mat-sidenav-container>
+    <mat-sidenav #sidenav mode="side" opened="true">
+      <app-aside-nav></app-aside-nav>
+    </mat-sidenav>
+    <mat-sidenav-content>
+      <router-outlet></router-outlet>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+</div>

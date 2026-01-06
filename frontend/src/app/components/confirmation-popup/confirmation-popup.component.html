@@ -1,0 +1,23 @@
+<div class="confirmation-popup">
+  <h1 mat-dialog-title class="confirmation-popup__title">{{data.title}}</h1>
+  <mat-dialog-content class="confirmation-popup__content">
+    <p>{{data.message}}</p>
+  </mat-dialog-content>
+  <mat-dialog-actions class="confirmation-popup__actions">
+    <button
+      mat-raised-button
+      color="primary"
+      class="confirmation-popup__button"
+      (click)="confirm()"
+    >
+      Confirm
+    </button>
+    <button
+      mat-raised-button
+      class="confirmation-popup__button"
+      (click)="close()"
+    >
+      Cancel
+    </button>
+  </mat-dialog-actions>
+</div>

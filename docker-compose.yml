@@ -1,0 +1,42 @@
+version: "3"
+
+services:
+  mongo_db:
+    container_name: mongo
+    image: mongo:latest
+    restart: always
+    networks:
+      - internalnet
+    volumes:
+      - mongo_db:/data/db
+
+  backend:
+    build: ./backend
+    ports:
+      - 4000:3000
+    environment:
+      APP_NAME: WordLink
+      PORT: 3000
+      DB_URL: mongodb://mongo_db:27017/wordlink
+    networks:
+      - internalnet
+    depends_on:
+      - mongo_db
+
+  frontend:
+    build: ./frontend
+    ports:
+      - 80:80
+    expose:
+      - 80
+    networks:
+      - internalnet
+    depends_on:
+      - backend
+
+networks:
+  internalnet:
+    driver: bridge
+
+volumes:
+  mongo_db: {}
