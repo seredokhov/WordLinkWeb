@@ -107,9 +107,14 @@ export class WordsListComponent implements OnInit, AfterViewInit, OnDestroy {
         onConfirm: () => {
           this.wordService.deleteWord(id)
             .pipe(takeUntil(this.destroy$))
-            .subscribe(() => {
-              const oldData = this.dataSource.data;
-              this.dataSource.data = oldData.filter(word => word.id !== id);
+            .subscribe({
+              next: () => {
+                const oldData = this.dataSource.data;
+                this.dataSource.data = oldData.filter(word => word.id !== id);
+              },
+              error: (error) => {
+                console.error('Error deleting word:', error);
+              }
             });
         }
       },
@@ -122,9 +127,15 @@ export class WordsListComponent implements OnInit, AfterViewInit, OnDestroy {
   getWords() {
     this.wordService.getWords()
       .pipe(takeUntil(this.destroy$))
-      .subscribe((words: WordData[]) => {
-        this.dataSource.data = words;
-        this.isLoading = false;
+      .subscribe({
+        next: (words: WordData[]) => {
+          this.dataSource.data = words;
+          this.isLoading = false;
+        },
+        error: (error) => {
+          console.error('Error fetching words:', error);
+          this.isLoading = false;
+        }
       })
   }
 

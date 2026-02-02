@@ -115,9 +115,16 @@ export class UsersListComponent implements AfterViewInit, OnInit, OnDestroy  {
     this.userService
       .getUsers()
       .pipe(takeUntil(this.destroy$))
-      .subscribe((users: UserData[]) => {
-        this.dataSource.data = users;
-        this.isLoading = false;
+      .subscribe({
+        next: (users: UserData[]) => {
+          this.dataSource.data = users;
+          this.isLoading = false;
+        },
+        error: (error) => {
+          console.error('Error fetching users:', error);
+          this.isLoading = false;
+          // Можно добавить показ уведомления пользователю
+        }
       });
   }
 
@@ -143,9 +150,14 @@ export class UsersListComponent implements AfterViewInit, OnInit, OnDestroy  {
         onConfirm: () => {
           this.userService.deleteUser(id)
             .pipe(takeUntil(this.destroy$))
-            .subscribe(() => {
-              const oldUsersData = this.dataSource.data;
-              this.dataSource.data = oldUsersData.filter(user => user.id !== id);
+            .subscribe({
+              next: () => {
+                const oldUsersData = this.dataSource.data;
+                this.dataSource.data = oldUsersData.filter(user => user.id !== id);
+              },
+              error: (error) => {
+                console.error('Error deleting user:', error);
+              }
             });
         }
       },

@@ -36,6 +36,7 @@ export class CreateUserModalComponent {
   public userForm: FormGroup
   public isPasswordHide: boolean = true;
   public isNewPasswordHide: boolean = true;
+  public error: string = '';
 
   constructor(private dialogRef: MatDialogRef<CreateUserModalComponent>) {
     this.userForm = new FormGroup<any>({
@@ -59,6 +60,7 @@ export class CreateUserModalComponent {
 
   saveData() {
     const { value } = this.userForm;
+    this.error = '';
 
     const userToCreate = {
       login: value.login,
@@ -68,10 +70,16 @@ export class CreateUserModalComponent {
 
     this.userService.createUser(userToCreate)
       .pipe(first())
-      .subscribe((createdUser: UserData) => {
-        const oldUsers = [...this.users.data];
-        this.users.data = [createdUser, ...oldUsers];
-        this.dialogRef.close();
+      .subscribe({
+        next: (createdUser: UserData) => {
+          const oldUsers = [...this.users.data];
+          this.users.data = [createdUser, ...oldUsers];
+          this.dialogRef.close();
+        },
+        error: (error) => {
+          console.error('Error creating user:', error);
+          this.error = error.error?.message || 'Failed to create user. Please try again.';
+        }
       });
   }
 }

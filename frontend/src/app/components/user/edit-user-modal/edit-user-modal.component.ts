@@ -32,6 +32,7 @@ export class EditUserModalComponent {
   private userService = inject(UserService);
   public data: UserData = inject(MAT_DIALOG_DATA);
   public userForm: FormGroup;
+  public error: string = '';
 
   constructor(private dialogRef: MatDialogRef<EditUserModalComponent>) {
     this.userForm = new FormGroup<any>({
@@ -45,6 +46,8 @@ export class EditUserModalComponent {
       return;
     }
 
+    this.error = '';
+
     const userToUpdate = {
       id: this.data.id,
       ...this.userForm.value
@@ -53,10 +56,16 @@ export class EditUserModalComponent {
     this.userService
       .updateUser(userToUpdate)
       .pipe(first())
-      .subscribe((updatedUserData: UserData) => {
-        this.data.login = updatedUserData.login;
-        this.data.name = updatedUserData.name;
-        this.dialogRef.close();
+      .subscribe({
+        next: (updatedUserData: UserData) => {
+          this.data.login = updatedUserData.login;
+          this.data.name = updatedUserData.name;
+          this.dialogRef.close();
+        },
+        error: (error) => {
+          console.error('Error updating user:', error);
+          this.error = error.error?.message || 'Failed to update user. Please try again.';
+        }
       });
   }
 }
