@@ -64,13 +64,17 @@
         <mat-icon>{{isNewPasswordHide ? 'visibility_off' : 'visibility'}}</mat-icon>
       </button>
       <mat-error *ngIf="userForm.controls['passwordConfirm'].invalid && (userForm.controls['passwordConfirm'].touched || userForm.controls['passwordConfirm'].dirty)">
-        Password mismatch
+        <span *ngIf="userForm.controls['passwordConfirm'].hasError('required')">Enter Password</span>
+        <span *ngIf="userForm.controls['passwordConfirm'].hasError('minlength')">Password must be at least 4 characters</span>
+      </mat-error>
+      <mat-error *ngIf="userForm.hasError('passwordMismatch') && userForm.controls['passwordConfirm'].touched && userForm.controls['password'].touched">
+        Passwords do not match
       </mat-error>
     </mat-form-field>
   </mat-dialog-content>
   <mat-dialog-actions class="create-user-form-actions">
     <button
-      [disabled]="!userForm.valid || userForm.controls['password'].value !== userForm.controls['passwordConfirm'].value"
+      [disabled]="!userForm.valid"
       mat-raised-button
       color="primary"
       class="create-user-form-actions__button"

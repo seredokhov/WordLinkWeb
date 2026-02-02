@@ -1,4 +1,5 @@
 import { Component, inject } from '@angular/core';
+import { first } from 'rxjs/operators';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
@@ -39,6 +40,7 @@ export class LoginPageComponent {
 
     this.adminService
       .login(body)
+      .pipe(first())
       .subscribe({
         next: (response: LoginResponse) => {
           localStorage.setItem('token', response.token);

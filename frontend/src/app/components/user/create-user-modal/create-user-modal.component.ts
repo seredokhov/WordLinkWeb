@@ -1,10 +1,11 @@
 import { Component, inject } from '@angular/core';
+import { first } from 'rxjs/operators';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { UserData } from '../../../models';
 import { CommonModule } from '@angular/common';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
@@ -38,11 +39,22 @@ export class CreateUserModalComponent {
 
   constructor(private dialogRef: MatDialogRef<CreateUserModalComponent>) {
     this.userForm = new FormGroup<any>({
-      name: new FormControl('', [Validators.required, Validators.min(4)]),
-      login: new FormControl('', [Validators.required, Validators.min(4)]),
-      password: new FormControl('', [Validators.required, Validators.min(5)]),
-      passwordConfirm: new FormControl('', [Validators.required, Validators.min(4)])
-    });
+      name: new FormControl('', [Validators.required, Validators.minLength(4)]),
+      login: new FormControl('', [Validators.required, Validators.minLength(4)]),
+      password: new FormControl('', [Validators.required, Validators.minLength(5)]),
+      passwordConfirm: new FormControl('', [Validators.required, Validators.minLength(4)])
+    }, { validators: this.passwordMatchValidator });
+  }
+
+  private passwordMatchValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
+    const password = control.get('password');
+    const passwordConfirm = control.get('passwordConfirm');
+
+    if (!password || !passwordConfirm) {
+      return null;
+    }
+
+    return password.value === passwordConfirm.value ? null : { passwordMismatch: true };
   }
 
   saveData() {
@@ -55,6 +67,7 @@ export class CreateUserModalComponent {
     }
 
     this.userService.createUser(userToCreate)
+      .pipe(first())
       .subscribe((createdUser: UserData) => {
         const oldUsers = [...this.users.data];
         this.users.data = [createdUser, ...oldUsers];

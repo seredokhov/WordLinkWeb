@@ -1,4 +1,5 @@
-import { Component, inject, OnInit, AfterViewInit, ViewChild } from '@angular/core';
+import { Component, inject, OnInit, AfterViewInit, ViewChild, OnDestroy } from '@angular/core';
+import { Subject, takeUntil } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -36,7 +37,7 @@ import { ConfirmationPopupComponent } from '../../confirmation-popup/confirmatio
   templateUrl: './words-list.component.html',
   styleUrl: './words-list.component.scss'
 })
-export class WordsListComponent implements OnInit, AfterViewInit {
+export class WordsListComponent implements OnInit, AfterViewInit, OnDestroy {
   public displayedColumns: string[] = [
     'id',
     'word',
@@ -48,6 +49,7 @@ export class WordsListComponent implements OnInit, AfterViewInit {
     'actions'
   ];
   private wordService = inject(WordService);
+  private destroy$ = new Subject<void>();
   public dataSource: MatTableDataSource<WordData>;
   public isLoading: boolean = true;
   public paginationOptions: number[] = [5, 10, 20];
@@ -77,6 +79,11 @@ export class WordsListComponent implements OnInit, AfterViewInit {
     this.dataSource.sort = this.sort;
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   searchFormInit() {
     this.searchForm = new FormGroup({
       wordInput: new FormControl('', Validators.pattern('^[a-zA-Z ]+&')),
@@ -99,6 +106,7 @@ export class WordsListComponent implements OnInit, AfterViewInit {
         message: 'Are you sure you want to delete this word?',
         onConfirm: () => {
           this.wordService.deleteWord(id)
+            .pipe(takeUntil(this.destroy$))
             .subscribe(() => {
               const oldData = this.dataSource.data;
               this.dataSource.data = oldData.filter(word => word.id !== id);
@@ -113,6 +121,7 @@ export class WordsListComponent implements OnInit, AfterViewInit {
 
   getWords() {
     this.wordService.getWords()
+      .pipe(takeUntil(this.destroy$))
       .subscribe((words: WordData[]) => {
         this.dataSource.data = words;
         this.isLoading = false;

@@ -1,4 +1,5 @@
-import { Component, inject, OnInit, AfterViewInit, ViewChild } from '@angular/core';
+import { Component, inject, OnInit, AfterViewInit, ViewChild, OnDestroy } from '@angular/core';
+import { Subject, takeUntil } from 'rxjs';
 import { HttpClientModule } from '@angular/common/http';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
@@ -42,7 +43,7 @@ import {ConfirmationPopupComponent} from '../../confirmation-popup/confirmation-
   templateUrl: './users-list.component.html',
   styleUrl: './users-list.component.scss'
 })
-export class UsersListComponent implements AfterViewInit, OnInit  {
+export class UsersListComponent implements AfterViewInit, OnInit, OnDestroy  {
   public displayedColumns: string[] = [
     'id',
     'login',
@@ -61,6 +62,7 @@ export class UsersListComponent implements AfterViewInit, OnInit  {
   public nameFilterValue: string = '';
   public date: Date = new Date();
   private userService = inject(UserService);
+  private destroy$ = new Subject<void>();
   private filterOptions: FilterOptions = {
     fields: ['login', 'name'],
     separator: '&'
@@ -89,6 +91,11 @@ export class UsersListComponent implements AfterViewInit, OnInit  {
     this.dataSource.sort = this.sort;
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   searchFormInit() {
     this.searchForm = new FormGroup({
       loginInput: new FormControl('', Validators.pattern('^[a-zA-Z ]+&')),
@@ -107,6 +114,7 @@ export class UsersListComponent implements AfterViewInit, OnInit  {
   fetchUsers() {
     this.userService
       .getUsers()
+      .pipe(takeUntil(this.destroy$))
       .subscribe((users: UserData[]) => {
         this.dataSource.data = users;
         this.isLoading = false;
@@ -134,6 +142,7 @@ export class UsersListComponent implements AfterViewInit, OnInit  {
         message: 'Are you sure you want to delete this user?',
         onConfirm: () => {
           this.userService.deleteUser(id)
+            .pipe(takeUntil(this.destroy$))
             .subscribe(() => {
               const oldUsersData = this.dataSource.data;
               this.dataSource.data = oldUsersData.filter(user => user.id !== id);

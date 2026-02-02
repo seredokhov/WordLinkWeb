@@ -1,4 +1,5 @@
 import { Component, inject } from '@angular/core';
+import { first } from 'rxjs/operators';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
@@ -8,7 +9,6 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { MatIcon } from '@angular/material/icon';
 import { UserService } from '../../../services/user.service';
 
 @Component({
@@ -35,8 +35,8 @@ export class EditUserModalComponent {
 
   constructor(private dialogRef: MatDialogRef<EditUserModalComponent>) {
     this.userForm = new FormGroup<any>({
-      name: new FormControl(this.data.name, [Validators.required, Validators.min(4)]),
-      login: new FormControl(this.data.login, [Validators.required, Validators.min(4)])
+      name: new FormControl(this.data.name, [Validators.required, Validators.minLength(4)]),
+      login: new FormControl(this.data.login, [Validators.required, Validators.minLength(4)])
     });
   }
 
@@ -52,6 +52,7 @@ export class EditUserModalComponent {
 
     this.userService
       .updateUser(userToUpdate)
+      .pipe(first())
       .subscribe((updatedUserData: UserData) => {
         this.data.login = updatedUserData.login;
         this.data.name = updatedUserData.name;
