@@ -1,10 +1,10 @@
-# WordLinkWeb
+# WordLinkAdmin
 
 Backend API and admin panel for WordLink vocabulary learning.  
 Serves the mobile client and provides an Angular admin UI for users and words.
 
 > Related repositories:  
-> - [WordLinkWeb](https://github.com/seredokhov/WordLinkWeb) — backend + admin panel  
+> - [WordLinkAdmin](https://github.com/seredokhov/WordLinkAdmin) — backend + admin panel  
 > - [WordLinkApp](https://github.com/seredokhov/WordLinkApp) — React Native client
 
 ## Screenshots
