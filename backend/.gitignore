@@ -43,3 +43,5 @@ out/
 coverage/
 .nyc_output/
 
+# Local seed script
+seed.js

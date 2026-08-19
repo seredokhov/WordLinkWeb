@@ -1,3 +1,5 @@
 /.idea/vcs.xml
 /.idea/workspace.xml
 .ssh/*
+/.idea/admin.iml
+/.idea/modules.xml
