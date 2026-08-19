@@ -5,7 +5,7 @@ import config from './../config.js';
 
 import { loginValidator, registrationValidator } from './validations/index.js';
 import { checkAuth, checkAdmin, handleErrors } from './middlewares/index.js';
-import { UserController, WordController, AdminController } from './controllers/index.js';
+import { UserController, WordController, AdminController, DictionaryController } from './controllers/index.js';
 
 mongoose.connect(config.db_url)
     .then(() => console.log('Database OK'))
@@ -44,6 +44,9 @@ app.post('/words/merge', checkAuth, handleErrors, WordController.mergeWords);
 app.patch('/word/save-results', checkAuth, WordController.saveResults);
 app.get('/words', checkAuth, WordController.getWords);
 app.delete('/word/delete/:id', checkAuth, WordController.deleteWord);
+
+app.get('/dictionaries', checkAuth, DictionaryController.getDictionaries);
+app.get('/dictionaries/:id/words', checkAuth, DictionaryController.getDictionaryWords);
 
 app.listen(config.port, err => {
     if (err) {
