@@ -1,6 +1,8 @@
 import { Routes } from '@angular/router';
 import { WordsPageComponent } from './pages/words-page/words-page.component';
 import { UsersPageComponent } from './pages/users-page/users-page.component';
+import { DictionariesPageComponent } from './pages/dictionaries-page/dictionaries-page.component';
+import { DictionaryWordsPageComponent } from './pages/dictionary-words-page/dictionary-words-page.component';
 import { LoginPageComponent } from './pages/login-page/login-page.component';
 import { MainPageComponent } from './pages/main-page/main-page.component';
 import { authGuard } from './guards/auth.guard';
@@ -16,6 +18,8 @@ export const routes: Routes = [
     component: MainPageComponent,
     children: [
       { path: 'users', component: UsersPageComponent },
+      { path: 'dictionaries', component: DictionariesPageComponent },
+      { path: 'dictionaries/:dictionaryId/words', component: DictionaryWordsPageComponent },
       { path: 'words', component: WordsPageComponent }
     ]
   },

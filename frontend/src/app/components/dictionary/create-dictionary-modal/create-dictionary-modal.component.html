@@ -1,0 +1,39 @@
+<form [formGroup]="dictionaryForm" class="create-dictionary-form">
+  <mat-dialog-content class="create-dictionary-form-content">
+    <h2 class="create-dictionary-form-content__title">
+      <span>Create Dictionary</span>
+    </h2>
+    <mat-form-field>
+      <mat-label>Title</mat-label>
+      <input
+        matInput
+        maxlength="50"
+        formControlName="title"
+      >
+      <mat-error *ngIf="dictionaryForm.controls['title'].invalid && (dictionaryForm.controls['title'].touched || dictionaryForm.controls['title'].dirty)">
+        Enter Title
+      </mat-error>
+    </mat-form-field>
+    <div *ngIf="error" class="create-dictionary-form__error">
+      <mat-error>{{error}}</mat-error>
+    </div>
+  </mat-dialog-content>
+  <mat-dialog-actions class="create-dictionary-form-actions">
+    <button
+      [disabled]="!dictionaryForm.valid"
+      mat-raised-button
+      color="primary"
+      class="create-dictionary-form-actions__button"
+      (click)="saveData()"
+    >
+      Save
+    </button>
+    <button
+      mat-raised-button
+      mat-dialog-close
+      class="create-dictionary-form-actions__button"
+    >
+      Close
+    </button>
+  </mat-dialog-actions>
+</form>

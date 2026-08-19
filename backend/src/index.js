@@ -23,6 +23,14 @@ app.post('/admin/user/create', checkAdmin, AdminController.createNewUser);
 app.delete('/admin/user/delete/:id', checkAdmin, AdminController.deleteUser);
 app.get('/admin/words', checkAdmin, AdminController.getAllWords);
 app.delete('/admin/word/delete/:id', checkAdmin, AdminController.deleteWord);
+app.get('/admin/dictionaries', checkAdmin, AdminController.getAllDictionaries);
+app.post('/admin/dictionary/create', checkAdmin, AdminController.createDictionary);
+app.patch('/admin/dictionary/update', checkAdmin, AdminController.updateDictionary);
+app.delete('/admin/dictionary/delete/:id', checkAdmin, AdminController.deleteDictionary);
+app.get('/admin/dictionary/:id/words', checkAdmin, AdminController.getDictionaryWords);
+app.post('/admin/dictionary/:id/word/create', checkAdmin, AdminController.createDictionaryWord);
+app.patch('/admin/dictionary/word/update', checkAdmin, AdminController.updateDictionaryWord);
+app.delete('/admin/dictionary/word/delete/:id', checkAdmin, AdminController.deleteDictionaryWord);
 
 app.post('/auth/login', loginValidator, UserController.login);
 app.post('/auth/registration', registrationValidator, handleErrors, UserController.createUser);

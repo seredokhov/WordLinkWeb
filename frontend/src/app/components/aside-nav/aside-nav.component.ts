@@ -25,6 +25,11 @@ export class AsideNavComponent {
       icon: 'supervisor_account'
     },
     {
+      name: 'Dictionaries',
+      path: '/main/dictionaries',
+      icon: 'library_books'
+    },
+    {
       name: 'Words',
       path: '/main/words',
       icon: 'book'

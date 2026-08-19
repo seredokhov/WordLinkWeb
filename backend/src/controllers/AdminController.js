@@ -1,5 +1,7 @@
 import UserModel from "../models/user.js";
 import WordModel from "../models/word.js";
+import DictionaryModel from "../models/dictionary.js";
+import DictionaryWordModel from "../models/dictionaryWord.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { wordResponseMapper } from '../utils.js';
@@ -182,6 +184,232 @@ export const deleteWord = async (req, res) => {
     } catch (err) {
         res.status(500).json({
             message: 'Cant delete word'
+        });
+    }
+}
+
+export const getAllDictionaries = async (req, res) => {
+    try {
+        const dictionaries = await DictionaryModel.find({});
+        const dictionaryWords = await DictionaryWordModel.find({});
+
+        const mappedDictionaries = dictionaries.map(dictionary => {
+            const wordsCount = dictionaryWords.filter(word => word.dictionaryId.equals(dictionary._id)).length;
+
+            return {
+                id: dictionary._id,
+                title: dictionary.title,
+                createdAt: dictionary.createdAt,
+                wordsCount
+            };
+        });
+
+        res.json(mappedDictionaries);
+    } catch (err) {
+        res.status(500).json({
+            message: 'Cant get dictionaries'
+        });
+    }
+};
+
+export const createDictionary = async (req, res) => {
+    try {
+        const { title } = req.body;
+
+        const dictionary = await DictionaryModel.create({
+            title
+        });
+
+        res.json({
+            id: dictionary._id,
+            title: dictionary.title,
+            createdAt: dictionary.createdAt,
+            wordsCount: 0
+        });
+    } catch (err) {
+        res.status(500).json({
+            message: 'Cant create dictionary'
+        });
+    }
+};
+
+export const updateDictionary = async (req, res) => {
+    try {
+        const dictionary = await DictionaryModel.findByIdAndUpdate(
+            req.body.id,
+            {
+                title: req.body.title
+            },
+            {
+                new: true
+            }
+        );
+
+        if (!dictionary) {
+            return res.status(404).json({
+                message: 'Dictionary not found'
+            });
+        }
+
+        res.json({
+            id: dictionary._id,
+            title: dictionary.title
+        });
+    } catch (err) {
+        res.status(500).json({
+            message: 'Cant update dictionary'
+        });
+    }
+};
+
+export const deleteDictionary = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        await DictionaryWordModel.deleteMany({
+            dictionaryId: id
+        });
+
+        await DictionaryModel.findOneAndDelete({
+            _id: id
+        });
+
+        res.json({
+            success: true
+        });
+    } catch (err) {
+        res.status(500).json({
+            message: 'Cant delete dictionary'
+        });
+    }
+};
+
+export const getDictionaryWords = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const dictionary = await DictionaryModel.findById(id);
+
+        if (!dictionary) {
+            return res.status(404).json({
+                message: 'Dictionary not found'
+            });
+        }
+
+        const words = await DictionaryWordModel.find({
+            dictionaryId: id
+        });
+
+        res.json({
+            dictionary: {
+                id: dictionary._id,
+                title: dictionary.title,
+                createdAt: dictionary.createdAt
+            },
+            words: words.map(word => ({
+                id: word._id,
+                word: word.word,
+                translate: word.translate,
+                dictionaryId: word.dictionaryId,
+                createdAt: word.createdAt
+            }))
+        });
+    } catch (err) {
+        res.status(500).json({
+            message: 'Cant get dictionary words'
+        });
+    }
+};
+
+export const createDictionaryWord = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { word, translate } = req.body;
+
+        const dictionary = await DictionaryModel.findById(id);
+
+        if (!dictionary) {
+            return res.status(404).json({
+                message: 'Dictionary not found'
+            });
+        }
+
+        const dictionaryWord = await DictionaryWordModel.create({
+            dictionaryId: id,
+            word,
+            translate
+        });
+
+        res.json({
+            id: dictionaryWord._id,
+            word: dictionaryWord.word,
+            translate: dictionaryWord.translate,
+            dictionaryId: dictionaryWord.dictionaryId,
+            createdAt: dictionaryWord.createdAt
+        });
+    } catch (err) {
+        if (err.code === 11000) {
+            return res.status(400).json({
+                message: 'Word already exists in this dictionary'
+            });
+        }
+
+        res.status(500).json({
+            message: 'Cant create dictionary word'
+        });
+    }
+};
+
+export const updateDictionaryWord = async (req, res) => {
+    try {
+        const dictionaryWord = await DictionaryWordModel.findByIdAndUpdate(
+            req.body.id,
+            {
+                word: req.body.word,
+                translate: req.body.translate
+            },
+            {
+                new: true
+            }
+        );
+
+        if (!dictionaryWord) {
+            return res.status(404).json({
+                message: 'Word not found'
+            });
+        }
+
+        res.json({
+            id: dictionaryWord._id,
+            word: dictionaryWord.word,
+            translate: dictionaryWord.translate
+        });
+    } catch (err) {
+        if (err.code === 11000) {
+            return res.status(400).json({
+                message: 'Word already exists in this dictionary'
+            });
+        }
+
+        res.status(500).json({
+            message: 'Cant update dictionary word'
+        });
+    }
+};
+
+export const deleteDictionaryWord = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        await DictionaryWordModel.findOneAndDelete({
+            _id: id
+        });
+
+        res.json({
+            success: true
+        });
+    } catch (err) {
+        res.status(500).json({
+            message: 'Cant delete dictionary word'
         });
     }
 }

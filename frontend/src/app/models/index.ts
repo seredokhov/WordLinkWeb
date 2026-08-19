@@ -24,6 +24,21 @@ export interface WordData {
   lastUpdate: string
 }
 
+export interface DictionaryData {
+  id?: string,
+  title: string,
+  wordsCount?: number,
+  createdAt?: string
+}
+
+export interface DictionaryWordData {
+  id?: string,
+  dictionaryId?: string,
+  word: string,
+  translate: string,
+  createdAt?: string
+}
+
 export interface ConfirmationPopupData {
   title: string,
   message: string,

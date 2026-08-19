@@ -1,0 +1,39 @@
+.page-header {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+
+  &__title {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0;
+  }
+}
+
+.search-form {
+  display: flex;
+  justify-content: space-between;
+
+  &__filter {
+    margin-right: 20px;
+  }
+
+  &__button {
+    height: 56px;
+    margin-left: 20px;
+    width: 150px;
+  }
+}
+
+.spinner {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  min-height: 372px;
+  padding: 40px;
+}
+
+.empty-cell {
+  padding: 16px;
+}
