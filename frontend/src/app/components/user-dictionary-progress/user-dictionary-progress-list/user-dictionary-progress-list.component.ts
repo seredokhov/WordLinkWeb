@@ -38,11 +38,12 @@ export class UserDictionaryProgressListComponent implements OnInit, AfterViewIni
   public displayedColumns: string[] = [
     'userLogin',
     'userName',
+    'dictionaryTheme',
     'dictionaryTitle',
-    'bestProgress',
-    'lastAttempt',
-    'lastTestDate',
-    'updatedAt'
+    'totalWords',
+    'bestProgressPercent',
+    'bestCorrectAnswers',
+    'lastCorrectCount'
   ];
 
   private userDictionaryProgressService = inject(UserDictionaryProgressService);
@@ -51,10 +52,10 @@ export class UserDictionaryProgressListComponent implements OnInit, AfterViewIni
   public isLoading: boolean = true;
   public paginationOptions: number[] = [5, 10, 20];
   public searchForm: FormGroup;
-  public userLoginFilterValue: string = '';
+  public userNameFilterValue: string = '';
   public dictionaryTitleFilterValue: string = '';
   private filterOptions: FilterOptions = {
-    fields: ['userLogin', 'dictionaryTitle'],
+    fields: ['userLogin', 'userName', 'dictionaryTheme', 'dictionaryTitle'],
     separator: '&'
   };
 
@@ -83,16 +84,16 @@ export class UserDictionaryProgressListComponent implements OnInit, AfterViewIni
 
   searchFormInit() {
     this.searchForm = new FormGroup({
-      userLoginInput: new FormControl('', Validators.pattern('^[a-zA-Z ]+&')),
+      userNameInput: new FormControl('', Validators.pattern('^[a-zA-Z ]+&')),
       dictionaryTitleInput: new FormControl('', Validators.pattern('^[a-zA-Z ]+&'))
     });
   }
 
   applyFilter() {
-    this.userLoginFilterValue = this.searchForm.get('userLoginInput')?.value || '';
+    this.userNameFilterValue = this.searchForm.get('userNameInput')?.value || '';
     this.dictionaryTitleFilterValue = this.searchForm.get('dictionaryTitleInput')?.value || '';
 
-    const filterValue = this.userLoginFilterValue + this.filterOptions.separator + this.dictionaryTitleFilterValue;
+    const filterValue = this.userNameFilterValue + this.filterOptions.separator + this.dictionaryTitleFilterValue;
     this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 
@@ -102,7 +103,10 @@ export class UserDictionaryProgressListComponent implements OnInit, AfterViewIni
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (items: UserDictionaryProgressData[]) => {
-          this.dataSource.data = items;
+          this.dataSource.data = items.map((item) => ({
+            ...item,
+            dictionaryTheme: item.dictionaryTheme || item.dictionaryTitle
+          }));
           this.isLoading = false;
         },
         error: (error) => {
@@ -115,13 +119,5 @@ export class UserDictionaryProgressListComponent implements OnInit, AfterViewIni
   refreshData() {
     this.isLoading = true;
     this.fetchProgress();
-  }
-
-  formatProgress(row: UserDictionaryProgressData) {
-    return `${row.bestCorrectCount} / ${row.totalCount} (${row.bestProgressPercent}%)`;
-  }
-
-  formatLastAttempt(row: UserDictionaryProgressData) {
-    return `${row.lastCorrectCount} / ${row.totalCount}`;
   }
 }

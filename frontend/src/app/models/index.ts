@@ -27,6 +27,7 @@ export interface WordData {
 export interface DictionaryData {
   id?: string,
   title: string,
+  theme: string,
   wordsCount?: number,
   createdAt?: string
 }
@@ -46,8 +47,9 @@ export interface UserDictionaryProgressData {
   userName: string,
   dictionaryId?: string,
   dictionaryTitle: string,
-  totalCount: number,
-  bestCorrectCount: number,
+  dictionaryTheme: string,
+  totalWords: number,
+  bestCorrectAnswers: number,
   bestProgressPercent: number,
   lastCorrectCount: number,
   lastTestDate?: string | null,

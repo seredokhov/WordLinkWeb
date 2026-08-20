@@ -204,6 +204,7 @@ export const getAllDictionaries = async (req, res) => {
             return {
                 id: dictionary._id,
                 title: dictionary.title,
+                theme: dictionary.theme || dictionary.title,
                 createdAt: dictionary.createdAt,
                 wordsCount
             };
@@ -219,31 +220,50 @@ export const getAllDictionaries = async (req, res) => {
 
 export const createDictionary = async (req, res) => {
     try {
-        const { title } = req.body;
+        const title = req.body.title?.trim();
+        const theme = req.body.theme?.trim();
+
+        if (!title || !theme) {
+            return res.status(400).json({
+                message: 'Title and theme are required'
+            });
+        }
 
         const dictionary = await DictionaryModel.create({
-            title
+            title,
+            theme
         });
 
         res.json({
             id: dictionary._id,
             title: dictionary.title,
+            theme: dictionary.theme || dictionary.title,
             createdAt: dictionary.createdAt,
             wordsCount: 0
         });
     } catch (err) {
         res.status(500).json({
-            message: 'Cant create dictionary'
+            message: err.message || 'Cant create dictionary'
         });
     }
 };
 
 export const updateDictionary = async (req, res) => {
     try {
+        const title = req.body.title?.trim();
+        const theme = req.body.theme?.trim();
+
+        if (!title || !theme) {
+            return res.status(400).json({
+                message: 'Title and theme are required'
+            });
+        }
+
         const dictionary = await DictionaryModel.findByIdAndUpdate(
             req.body.id,
             {
-                title: req.body.title
+                title,
+                theme
             },
             {
                 new: true
@@ -258,11 +278,12 @@ export const updateDictionary = async (req, res) => {
 
         res.json({
             id: dictionary._id,
-            title: dictionary.title
+            title: dictionary.title,
+            theme: dictionary.theme || dictionary.title
         });
     } catch (err) {
         res.status(500).json({
-            message: 'Cant update dictionary'
+            message: err.message || 'Cant update dictionary'
         });
     }
 };
@@ -312,6 +333,7 @@ export const getDictionaryWords = async (req, res) => {
             dictionary: {
                 id: dictionary._id,
                 title: dictionary.title,
+                theme: dictionary.theme || dictionary.title,
                 createdAt: dictionary.createdAt
             },
             words: words.map(word => ({
@@ -451,8 +473,9 @@ export const getAllUserDictionaries = async (req, res) => {
                 userName: user?.name ?? '',
                 dictionaryId: item.dictionaryId,
                 dictionaryTitle: dictionary?.title ?? '',
-                totalCount: item.totalCount,
-                bestCorrectCount: item.bestCorrectCount,
+                dictionaryTheme: dictionary?.theme || dictionary?.title || '',
+                totalWords: item.totalWords,
+                bestCorrectAnswers: item.bestCorrectAnswers,
                 bestProgressPercent: item.bestProgressPercent,
                 lastCorrectCount: item.lastCorrectCount,
                 lastTestDate: item.lastTestDate,

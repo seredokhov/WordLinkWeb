@@ -165,7 +165,10 @@ export class DictionaryWordsListComponent implements OnInit, AfterViewInit, OnDe
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response: DictionaryWordsResponse) => {
-          this.dictionary = response.dictionary;
+          this.dictionary = {
+            ...response.dictionary,
+            theme: response.dictionary.theme || response.dictionary.title
+          };
           this.dataSource.data = response.words;
           this.isLoading = false;
         },

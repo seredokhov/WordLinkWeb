@@ -14,6 +14,17 @@
         Enter Title
       </mat-error>
     </mat-form-field>
+    <mat-form-field>
+      <mat-label>Theme</mat-label>
+      <input
+        matInput
+        maxlength="50"
+        formControlName="theme"
+      >
+      <mat-error *ngIf="dictionaryForm.controls['theme'].invalid && (dictionaryForm.controls['theme'].touched || dictionaryForm.controls['theme'].dirty)">
+        Enter Theme
+      </mat-error>
+    </mat-form-field>
     <div *ngIf="error" class="edit-dictionary-form__error">
       <mat-error>{{error}}</mat-error>
     </div>

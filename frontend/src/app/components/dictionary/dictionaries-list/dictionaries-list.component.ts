@@ -44,6 +44,7 @@ export class DictionariesListComponent implements OnInit, AfterViewInit, OnDestr
   public displayedColumns: string[] = [
     'id',
     'title',
+    'theme',
     'wordsCount',
     'createdAt',
     'actions'
@@ -57,8 +58,9 @@ export class DictionariesListComponent implements OnInit, AfterViewInit, OnDestr
   public paginationOptions: number[] = [5, 10, 20];
   public searchForm: FormGroup;
   public titleFilterValue: string = '';
+  public themeFilterValue: string = '';
   private filterOptions: FilterOptions = {
-    fields: ['title'],
+    fields: ['title', 'theme'],
     separator: '&'
   };
 
@@ -91,13 +93,17 @@ export class DictionariesListComponent implements OnInit, AfterViewInit, OnDestr
 
   searchFormInit() {
     this.searchForm = new FormGroup({
-      titleInput: new FormControl('', Validators.pattern('^[a-zA-Z ]+&'))
+      titleInput: new FormControl('', Validators.pattern('^[a-zA-Z ]+&')),
+      themeInput: new FormControl('', Validators.pattern('^[a-zA-Z ]+&'))
     });
   }
 
   applyFilter() {
     this.titleFilterValue = this.searchForm.get('titleInput')?.value || '';
-    this.dataSource.filter = this.titleFilterValue.trim().toLowerCase();
+    this.themeFilterValue = this.searchForm.get('themeInput')?.value || '';
+
+    const filterValue = this.titleFilterValue + this.filterOptions.separator + this.themeFilterValue;
+    this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 
   openDeleteDictionaryPopup(id: string) {
@@ -131,7 +137,11 @@ export class DictionariesListComponent implements OnInit, AfterViewInit, OnDestr
       autoFocus: false
     };
 
-    this.createDictionaryPopup.open(CreateDictionaryModalComponent, popupData);
+    const dialogRef = this.createDictionaryPopup.open(CreateDictionaryModalComponent, popupData);
+
+    dialogRef.afterClosed()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => this.refreshData());
   }
 
   openEditDictionaryPopup(dictionary: DictionaryData) {
@@ -140,7 +150,11 @@ export class DictionariesListComponent implements OnInit, AfterViewInit, OnDestr
       autoFocus: false
     };
 
-    this.editDictionaryPopup.open(EditDictionaryModalComponent, popupData);
+    const dialogRef = this.editDictionaryPopup.open(EditDictionaryModalComponent, popupData);
+
+    dialogRef.afterClosed()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => this.refreshData());
   }
 
   openDictionaryWords(dictionary: DictionaryData) {
@@ -156,7 +170,10 @@ export class DictionariesListComponent implements OnInit, AfterViewInit, OnDestr
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (dictionaries: DictionaryData[]) => {
-          this.dataSource.data = dictionaries;
+          this.dataSource.data = dictionaries.map((dictionary) => ({
+            ...dictionary,
+            theme: dictionary.theme || dictionary.title
+          }));
           this.isLoading = false;
         },
         error: (error) => {

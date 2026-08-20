@@ -12,12 +12,12 @@ const UserDictionarySchema = mongoose.Schema(
             ref: 'Dictionary',
             required: true
         },
-        totalCount: {
+        totalWords: {
             type: Number,
             required: true,
             min: 1
         },
-        bestCorrectCount: {
+        bestCorrectAnswers: {
             type: Number,
             default: 0,
             min: 0

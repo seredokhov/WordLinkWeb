@@ -9,24 +9,25 @@ export const wordResponseMapper = wordData => ({
 });
 
 export const defaultDictionaryProgress = () => ({
-    bestCorrectCount: 0,
+    bestCorrectAnswers: 0,
     bestProgressPercent: 0,
     lastCorrectCount: 0,
     lastTestDate: null
 });
 
 export const userDictionaryProgressMapper = (progressData) => ({
-    bestCorrectCount: progressData.bestCorrectCount,
+    bestCorrectAnswers: progressData.bestCorrectAnswers,
     bestProgressPercent: progressData.bestProgressPercent,
     lastCorrectCount: progressData.lastCorrectCount,
     lastTestDate: progressData.lastTestDate
 });
 
-export const userDictionaryResponseMapper = (progressData, dictionaryTitle = null) => ({
+export const userDictionaryResponseMapper = (progressData, dictionary = null) => ({
     id: progressData._id,
     userId: progressData.userId,
     dictionaryId: progressData.dictionaryId,
-    dictionaryTitle,
-    totalCount: progressData.totalCount,
+    dictionaryTitle: dictionary?.title ?? null,
+    dictionaryTheme: dictionary?.theme || dictionary?.title || null,
+    totalWords: progressData.totalWords,
     ...userDictionaryProgressMapper(progressData)
 });

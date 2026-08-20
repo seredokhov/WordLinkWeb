@@ -34,7 +34,8 @@ export class EditDictionaryModalComponent {
 
   constructor(private dialogRef: MatDialogRef<EditDictionaryModalComponent>) {
     this.dictionaryForm = new FormGroup<any>({
-      title: new FormControl(this.data.title, [Validators.required, Validators.minLength(2)])
+      title: new FormControl(this.data.title, [Validators.required, Validators.minLength(2)]),
+      theme: new FormControl(this.data.theme || this.data.title || '', [Validators.required, Validators.minLength(2)])
     });
   }
 
@@ -56,7 +57,8 @@ export class EditDictionaryModalComponent {
       .subscribe({
         next: (updatedDictionaryData: DictionaryData) => {
           this.data.title = updatedDictionaryData.title;
-          this.dialogRef.close();
+          this.data.theme = updatedDictionaryData.theme || updatedDictionaryData.title;
+          this.dialogRef.close(updatedDictionaryData);
         },
         error: (error) => {
           console.error('Error updating dictionary:', error);

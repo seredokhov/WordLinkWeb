@@ -18,11 +18,11 @@ const assertUserAccess = (req, res, userId) => {
     return true;
 };
 
-const calculateBestProgress = (correctCount, totalCount) => {
-    const bestProgressPercent = Math.round((correctCount / totalCount) * 100);
+const calculateBestProgress = (correctCount, totalWords) => {
+    const bestProgressPercent = Math.round((correctCount / totalWords) * 100);
 
     return {
-        bestCorrectCount: correctCount,
+        bestCorrectAnswers: correctCount,
         bestProgressPercent: Math.min(bestProgressPercent, 100)
     };
 };
@@ -47,6 +47,7 @@ export const getDictionaries = async (req, res) => {
             return {
                 id: dictionary._id,
                 title: dictionary.title,
+                theme: dictionary.theme || dictionary.title,
                 wordsCount,
                 progress: userProgress
                     ? userDictionaryProgressMapper(userProgress)
@@ -79,6 +80,7 @@ export const getDictionaryWords = async (req, res) => {
             dictionary: {
                 id: dictionary._id,
                 title: dictionary.title,
+                theme: dictionary.theme || dictionary.title,
                 createdAt: dictionary.createdAt
             },
             words: words.map((word) => ({
@@ -125,12 +127,13 @@ export const getDictionaryProgress = async (req, res) => {
                 userId,
                 dictionaryId,
                 dictionaryTitle: dictionary.title,
-                totalCount: dictionaryWordsCount,
+                dictionaryTheme: dictionary.theme || dictionary.title,
+                totalWords: dictionaryWordsCount,
                 ...defaultDictionaryProgress()
             });
         }
 
-        res.json(userDictionaryResponseMapper(userProgress, dictionary.title));
+        res.json(userDictionaryResponseMapper(userProgress, dictionary));
     } catch (err) {
         res.status(500).json({
             message: 'Cant get dictionary progress'
@@ -141,7 +144,7 @@ export const getDictionaryProgress = async (req, res) => {
 export const saveDictionaryProgress = async (req, res) => {
     try {
         const { userId, dictionaryId } = req.params;
-        const { correctCount, totalCount } = req.body;
+        const { correctCount, totalWords } = req.body;
 
         if (!assertUserAccess(req, res, userId)) {
             return;
@@ -149,10 +152,10 @@ export const saveDictionaryProgress = async (req, res) => {
 
         if (
             typeof correctCount !== 'number' ||
-            typeof totalCount !== 'number' ||
-            totalCount <= 0 ||
+            typeof totalWords !== 'number' ||
+            totalWords <= 0 ||
             correctCount < 0 ||
-            correctCount > totalCount
+            correctCount > totalWords
         ) {
             return res.status(400).json({
                 message: 'Invalid progress data'
@@ -171,11 +174,11 @@ export const saveDictionaryProgress = async (req, res) => {
             dictionaryId
         });
 
-        const bestCorrectCount = Math.max(
-            existingProgress?.bestCorrectCount ?? 0,
+        const bestCorrectAnswers = Math.max(
+            existingProgress?.bestCorrectAnswers ?? 0,
             correctCount
         );
-        const bestProgress = calculateBestProgress(bestCorrectCount, totalCount);
+        const bestProgress = calculateBestProgress(bestCorrectAnswers, totalWords);
         const lastTestDate = new Date();
 
         const userProgress = await UserDictionaryModel.findOneAndUpdate(
@@ -186,8 +189,8 @@ export const saveDictionaryProgress = async (req, res) => {
             {
                 userId,
                 dictionaryId,
-                totalCount,
-                bestCorrectCount: bestProgress.bestCorrectCount,
+                totalWords,
+                bestCorrectAnswers: bestProgress.bestCorrectAnswers,
                 bestProgressPercent: bestProgress.bestProgressPercent,
                 lastCorrectCount: correctCount,
                 lastTestDate
@@ -199,7 +202,7 @@ export const saveDictionaryProgress = async (req, res) => {
             }
         );
 
-        res.json(userDictionaryResponseMapper(userProgress, dictionary.title));
+        res.json(userDictionaryResponseMapper(userProgress, dictionary));
     } catch (err) {
         res.status(500).json({
             message: 'Cant save dictionary progress'

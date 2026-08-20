@@ -35,6 +35,7 @@ export class CreateDictionaryModalComponent {
   constructor(private dialogRef: MatDialogRef<CreateDictionaryModalComponent>) {
     this.dictionaryForm = new FormGroup<any>({
       title: new FormControl('', [Validators.required, Validators.minLength(2)]),
+      theme: new FormControl('', [Validators.required, Validators.minLength(2)]),
     });
   }
 
@@ -43,16 +44,15 @@ export class CreateDictionaryModalComponent {
     this.error = '';
 
     const dictionaryToCreate = {
-      title: value.title
+      title: value.title,
+      theme: value.theme
     };
 
     this.dictionaryService.createDictionary(dictionaryToCreate)
       .pipe(first())
       .subscribe({
         next: (createdDictionary: DictionaryData) => {
-          const oldDictionaries = [...this.dictionaries.data];
-          this.dictionaries.data = [createdDictionary, ...oldDictionaries];
-          this.dialogRef.close();
+          this.dialogRef.close(createdDictionary);
         },
         error: (error) => {
           console.error('Error creating dictionary:', error);

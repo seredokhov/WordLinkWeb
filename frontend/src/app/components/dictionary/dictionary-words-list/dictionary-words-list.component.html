@@ -3,7 +3,8 @@
     <mat-icon>arrow_back</mat-icon>
     Back
   </button>
-  <h2 class="page-header__title">{{dictionary?.title}}</h2>
+  <h2 class="page-header__title">{{ dictionary?.title }}</h2>
+  <p *ngIf="dictionary?.theme" class="page-header__theme">Theme: {{ dictionary?.theme || dictionary?.title }}</p>
 </div>
 
 <form [formGroup]="searchForm" class="search-form">

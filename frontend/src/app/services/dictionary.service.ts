@@ -10,10 +10,10 @@ export class DictionaryService {
   private http = inject(HttpClient);
 
   getDictionaries() {
-    return this.http.get(`${environment.API_URL}/admin/dictionaries`);
+    return this.http.get<DictionaryData[]>(`${environment.API_URL}/admin/dictionaries`);
   }
 
-  createDictionary(body: Pick<DictionaryData, 'title'>) {
+  createDictionary(body: Pick<DictionaryData, 'title' | 'theme'>) {
     return this.http.post(`${environment.API_URL}/admin/dictionary/create`, body);
   }
 
