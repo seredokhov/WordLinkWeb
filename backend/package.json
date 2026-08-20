@@ -8,6 +8,7 @@
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
     "seed": "node seed.js",
+    "seed:prod-dictionaries": "node seed-prod-dictionaries.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",

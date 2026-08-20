@@ -6,4 +6,5 @@ RUN npm install
 COPY ./src ./src
 COPY ./.env ./
 COPY ./config.js ./
+COPY ./seed-prod-dictionaries.js ./
 CMD ["npm", "start"]

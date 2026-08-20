@@ -16,5 +16,17 @@ jobs:
             cd ${{ secrets.DEPLOY_PATH }}
             git pull origin master
             docker compose up -d --build
+
+            curl -fsSL \
+              -H "Accept: application/octet-stream" \
+              -H "Authorization: Bearer ${{ secrets.GH_TOKEN }}" \
+              -o /tmp/dictionaries.prod.json \
+              "${{ secrets.DICTIONARIES_DATA_URL }}"
+
+            docker compose cp /tmp/dictionaries.prod.json backend:/tmp/dictionaries.prod.json
+            docker compose exec -T backend node seed-prod-dictionaries.js /tmp/dictionaries.prod.json
+            rm -f /tmp/dictionaries.prod.json
+            docker compose exec -T backend rm -f /tmp/dictionaries.prod.json
+
             docker image prune -f
             docker builder prune -f --filter "until=24h"

@@ -45,3 +45,6 @@ coverage/
 
 # Local seed script
 seed.js
+
+# Prod dictionary data (upload to GitHub Release)
+dictionaries.prod.json
