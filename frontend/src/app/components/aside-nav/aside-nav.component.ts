@@ -25,14 +25,19 @@ export class AsideNavComponent {
       icon: 'supervisor_account'
     },
     {
+      name: 'User Words',
+      path: '/main/words',
+      icon: 'book'
+    },
+    {
       name: 'Dictionaries',
       path: '/main/dictionaries',
       icon: 'library_books'
     },
     {
-      name: 'Words',
-      path: '/main/words',
-      icon: 'book'
+      name: 'User Dictionary',
+      path: '/main/user-dictionary-progress',
+      icon: 'school'
     }
   ];
 }

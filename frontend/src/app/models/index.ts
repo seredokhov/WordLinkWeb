@@ -39,6 +39,21 @@ export interface DictionaryWordData {
   createdAt?: string
 }
 
+export interface UserDictionaryProgressData {
+  id?: string,
+  userId?: string,
+  userLogin: string,
+  userName: string,
+  dictionaryId?: string,
+  dictionaryTitle: string,
+  totalCount: number,
+  bestCorrectCount: number,
+  bestProgressPercent: number,
+  lastCorrectCount: number,
+  lastTestDate?: string | null,
+  updatedAt?: string
+}
+
 export interface ConfirmationPopupData {
   title: string,
   message: string,

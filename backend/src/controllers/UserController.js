@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import UserModel from "../models/user.js";
 import WordModel from "../models/word.js";
+import UserDictionaryModel from "../models/userDictionary.js";
 import config from "../../config.js";
 
 export const createUser = async (req, res) => {
@@ -139,6 +140,10 @@ export const getUser = async (req, res) => {
 export const deleteUser = async (req, res) => {
     try {
         await WordModel.deleteMany({
+            userId: req.userId
+        });
+
+        await UserDictionaryModel.deleteMany({
             userId: req.userId
         });
 

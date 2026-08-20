@@ -2,6 +2,7 @@ import UserModel from "../models/user.js";
 import WordModel from "../models/word.js";
 import DictionaryModel from "../models/dictionary.js";
 import DictionaryWordModel from "../models/dictionaryWord.js";
+import UserDictionaryModel from "../models/userDictionary.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { wordResponseMapper } from '../utils.js';
@@ -131,6 +132,10 @@ export const deleteUser = async (req, res) => {
         const { id } = req.params;
 
         await WordModel.deleteMany({
+            userId: id
+        });
+
+        await UserDictionaryModel.deleteMany({
             userId: id
         });
 
@@ -267,6 +272,10 @@ export const deleteDictionary = async (req, res) => {
         const { id } = req.params;
 
         await DictionaryWordModel.deleteMany({
+            dictionaryId: id
+        });
+
+        await UserDictionaryModel.deleteMany({
             dictionaryId: id
         });
 
@@ -413,3 +422,48 @@ export const deleteDictionaryWord = async (req, res) => {
         });
     }
 }
+
+export const getAllUserDictionaries = async (req, res) => {
+    try {
+        const { userId, dictionaryId } = req.query;
+        const filter = {};
+
+        if (userId) {
+            filter.userId = userId;
+        }
+
+        if (dictionaryId) {
+            filter.dictionaryId = dictionaryId;
+        }
+
+        const userDictionaries = await UserDictionaryModel.find(filter);
+        const users = await UserModel.find({});
+        const dictionaries = await DictionaryModel.find({});
+
+        const mappedUserDictionaries = userDictionaries.map((item) => {
+            const user = users.find((entry) => entry._id.equals(item.userId));
+            const dictionary = dictionaries.find((entry) => entry._id.equals(item.dictionaryId));
+
+            return {
+                id: item._id,
+                userId: item.userId,
+                userLogin: user?.login ?? '',
+                userName: user?.name ?? '',
+                dictionaryId: item.dictionaryId,
+                dictionaryTitle: dictionary?.title ?? '',
+                totalCount: item.totalCount,
+                bestCorrectCount: item.bestCorrectCount,
+                bestProgressPercent: item.bestProgressPercent,
+                lastCorrectCount: item.lastCorrectCount,
+                lastTestDate: item.lastTestDate,
+                updatedAt: item.updatedAt
+            };
+        });
+
+        res.json(mappedUserDictionaries);
+    } catch (err) {
+        res.status(500).json({
+            message: 'Cant get user dictionaries'
+        });
+    }
+};

@@ -31,6 +31,7 @@ app.get('/admin/dictionary/:id/words', checkAdmin, AdminController.getDictionary
 app.post('/admin/dictionary/:id/word/create', checkAdmin, AdminController.createDictionaryWord);
 app.patch('/admin/dictionary/word/update', checkAdmin, AdminController.updateDictionaryWord);
 app.delete('/admin/dictionary/word/delete/:id', checkAdmin, AdminController.deleteDictionaryWord);
+app.get('/admin/user-dictionaries', checkAdmin, AdminController.getAllUserDictionaries);
 
 app.post('/auth/login', loginValidator, UserController.login);
 app.post('/auth/registration', registrationValidator, handleErrors, UserController.createUser);
@@ -47,6 +48,8 @@ app.delete('/word/delete/:id', checkAuth, WordController.deleteWord);
 
 app.get('/dictionaries', checkAuth, DictionaryController.getDictionaries);
 app.get('/dictionaries/:id/words', checkAuth, DictionaryController.getDictionaryWords);
+app.get('/users/:userId/dictionaries/:dictionaryId/progress', checkAuth, DictionaryController.getDictionaryProgress);
+app.put('/users/:userId/dictionaries/:dictionaryId/progress', checkAuth, DictionaryController.saveDictionaryProgress);
 
 app.listen(config.port, err => {
     if (err) {
